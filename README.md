@@ -10,15 +10,15 @@
 
 
 ### Team Members
-- Team Lead: [Name] - [College]
-- Member 2: [Name] - [College]
-- Member 3: [Name] - [College]
+- Team Lead: Abhinand A V - COLLEGE OF ENGINEERING VADAKARA
+- Member 2:Abhinand A V - COLLEGE OF ENGINEERING VADAKARA
+- Member 3: Devaj R -  COLLEGE OF ENGINEERING VADAKARA
 
 ### Project Description
-[2-3 lines about what your project does]
+Enterprise Defense Suite  is a satirical "Anti-Antivirus" web application built to achieve the exact opposite of digital security. Masquerading as a high-tech, dark-mode corporate defense tool, the software operates on strict reverse logic to ensure maximum system vulnerability.
 
 ### The Problem (that doesn't exist)
-[What ridiculous problem are you solving?]
+we are sympathysing for the virus by allowing it to exist while blocking the other file
 
 ### The Solution (that nobody asked for)
 [How are you solving it? Keep it fun!]
