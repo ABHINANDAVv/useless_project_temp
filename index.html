@@ -391,7 +391,14 @@
         const MEME_SCANNING = "assets/1000153357.png";
         const MEME_DONE = "assets/1000153398.png";
 
-        const SPEECH_IDLE = "System Online. Ready to eradicate productivity.";
+        const SPEECH_IDLE = "Welcome! System Online. Ready to eradicate productivity.";
+
+        // How long (ms) each mascot state stays on screen before moving to the next,
+        // so the picture + caption are actually readable instead of flashing by.
+        const MASCOT_WELCOME_MS = 3500;
+        const MASCOT_SCAN_START_MS = 3500;
+        const MASCOT_SCANNING_MIN_MS = 4000;
+        const MASCOT_DONE_HOLD_MS = 0; // last picture just stays until next scan
         const SPEECH_SCAN_START = "ചേട്ടാ... ആ ലാപ്ടോപ്പിൽ എന്തെങ്കിലും വൈറസ് ഉണ്ടോന്ന് ഞാൻ ഒന്ന് നോക്കട്ടെ? എന്റെയൊരു സമാധാനത്തിന്...";
         const SPEECH_SCANNING = "സ്കാനിംഗ് തീരാൻ ലേശം ടൈം എടുക്കും, അതുവരെ നമുക്ക് സംസാരിക്കാം... നാട്ടിലെന്താ വിശേഷം? കല്യാണം ഒക്കെ നോക്കുന്നില്ലേ";
         const SPEECH_DONE = "...";
@@ -502,20 +509,25 @@
             resolveBtn.style.display = "none";
             resolveBtn.classList.remove("flash");
 
-            statusLabel.textContent = "SYSTEM STATUS: SCAN IN PROGRESS";
-            statusSub.textContent = `Deep-scanning ${filenames.length} file(s) in: ${folderLabel}`;
-            log("", "sys");
-            log(`=== Beginning deep scan of: ${folderLabel} ===`, "amber");
-
-            setMascot(MEME_SCAN_START, SPEECH_SCAN_START);
-
             scanning = true;
             scanBtn.disabled = true;
             scanBtn.textContent = "Scanning...";
 
-            setTimeout(() => {
-                if (scanning) setMascot(MEME_SCANNING, SPEECH_SCANNING);
-            }, 900);
+            // --- Stage 1: "about to scan" mascot, held long enough to actually read ---
+            setMascot(MEME_SCAN_START, SPEECH_SCAN_START);
+            statusLabel.textContent = "SYSTEM STATUS: PREPARING SCAN";
+            statusSub.textContent = `Getting ready to deep-scan ${filenames.length} file(s) in: ${folderLabel}`;
+            log("", "sys");
+            log(`=== Preparing deep scan of: ${folderLabel} ===`, "amber");
+            await sleep(MASCOT_WELCOME_MS);
+
+            // --- Stage 2: scanning mascot, held for a guaranteed minimum time ---
+            setMascot(MEME_SCANNING, SPEECH_SCANNING);
+            statusLabel.textContent = "SYSTEM STATUS: SCAN IN PROGRESS";
+            statusSub.textContent = `Deep-scanning ${filenames.length} file(s) in: ${folderLabel}`;
+            log(`=== Beginning deep scan of: ${folderLabel} ===`, "amber");
+
+            const scanStartedAt = Date.now();
 
             for (const filename of filenames) {
                 const phrase = randChoice(ANALYSIS_PHRASES);
@@ -535,6 +547,13 @@
                     log(`[${filename}] No matching profile. Marked inconclusive.`, "sys");
                 }
                 await sleep(randRange(150, 300));
+            }
+
+            // If the file list was short and the loop finished fast, still hold the
+            // "scanning" mascot for the minimum time so its caption is readable.
+            const elapsed = Date.now() - scanStartedAt;
+            if (elapsed < MASCOT_SCANNING_MIN_MS) {
+                await sleep(MASCOT_SCANNING_MIN_MS - elapsed);
             }
 
             finishScan();
